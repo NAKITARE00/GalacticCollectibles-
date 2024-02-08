@@ -14,6 +14,7 @@ contract GalacticCollectibles is ERC721URIStorage {
     address payable owner;
 
     mapping(uint256 => MarketItem) private idToMarketItem;
+    mapping(uint256 => Auction) private idToAuction;
 
     struct MarketItem {
         uint256 tokenId;
@@ -28,6 +29,16 @@ contract GalacticCollectibles is ERC721URIStorage {
         bool sold;
     }
 
+    struct Auction {
+        uint256 tokenId;
+        address payable seller;
+        uint256 startingPrice;
+        uint256 endTime;
+        address highestBidder;
+        uint256 highestBid;
+        bool ended;
+    }
+
     event MarketItemCreated(
         uint256 indexed tokenId,
         string name,
@@ -40,19 +51,31 @@ contract GalacticCollectibles is ERC721URIStorage {
         bool sold
     );
 
+    event AuctionCreated(
+        uint256 indexed tokenId,
+        address seller,
+        uint256 startingPrice,
+        uint256 endTime
+    );
+
+    event BidPlaced(uint256 indexed tokenId, address indexed bidder, uint256 bid);
+
+    event AuctionEnded(uint256 indexed tokenId, address indexed winner, uint256 winningBid);
+
+
     constructor() ERC721("Crypto Tokens", "CT") {
         owner = payable(msg.sender);
     }
 
-
-
     // Mint the Token and list it in the marketplace
-    function createToken(string memory tokenURI,string memory _name,
-    uint256 price, 
-    string memory _dateFound, 
-    string memory _rightAscension,
-    string memory _declination, 
-    string memory _additionalInfo
+    function createToken(
+        string memory tokenURI,
+        string memory _name,
+        uint256 price, 
+        string memory _dateFound, 
+        string memory _rightAscension,
+        string memory _declination, 
+        string memory _additionalInfo
     )
         public
         payable
@@ -70,12 +93,13 @@ contract GalacticCollectibles is ERC721URIStorage {
     // create market item
     function createMarketItem(
         uint256 tokenId,
-     string memory _name,
-    uint256 price, 
-    string memory _dateFound, 
-    string memory _rightAscension,
-    string memory _declination, 
-    string memory _additionaInfo) private {
+        string memory _name,
+        uint256 price, 
+        string memory _dateFound, 
+        string memory _rightAscension,
+        string memory _declination, 
+        string memory _additionaInfo) private 
+        {
         require(price > 0, "Price must be at least 1 wei");
         idToMarketItem[tokenId] = MarketItem(
             tokenId,
@@ -102,7 +126,60 @@ contract GalacticCollectibles is ERC721URIStorage {
             false
         );
     }
+ 
+    function createAuction(uint256 tokenId, uint256 startingPrice, uint256 duration) public {
+        require(idToMarketItem[tokenId].owner == msg.sender, "Only item owner can create an auction");
+        require(startingPrice > 0, "Starting price must be greater than 0");
 
+        uint256 endTime = block.timestamp + duration;
+        idToAuction[tokenId] = Auction(
+            tokenId,
+            payable(msg.sender),
+            startingPrice,
+            endTime,
+            address(0),
+            0,
+            false
+        );
+
+        emit AuctionCreated(tokenId, msg.sender, startingPrice, endTime);
+    }
+
+    // place a bid on an ongoing auction
+    function placeBid(uint256 tokenId) public payable {
+        Auction storage auction = idToAuction[tokenId];
+        require(auction.endTime > block.timestamp, "Auction has ended");
+        require(msg.value > auction.highestBid, "Bid must be greater than current highest bid");
+
+        if (auction.highestBidder != address(0)) {
+            // refund the previous highest bidder
+            payable(auction.highestBidder).transfer(auction.highestBid);
+        }
+
+        auction.highestBidder = msg.sender;
+        auction.highestBid = msg.value;
+
+        emit BidPlaced(tokenId, msg.sender, msg.value);
+    }
+
+    // end an ongoing auction and transfer the NFT to the highest bidder
+    function endAuction(uint256 tokenId) public {
+        Auction storage auction = idToAuction[tokenId];
+        require(auction.endTime <= block.timestamp, "Auction is still ongoing");
+        require(!auction.ended, "Auction has already ended");
+
+        auction.ended = true;
+
+        if (auction.highestBidder != address(0)) {
+            idToMarketItem[tokenId].owner = payable(auction.highestBidder);
+            idToMarketItem[tokenId].sold = true;
+            _itemsSold.increment();
+            _transfer(address(this), auction.highestBidder, tokenId);
+
+            emit AuctionEnded(tokenId, auction.highestBidder, auction.highestBid);
+        }
+    }
+   
     // allow someone to resell
     function resellToken(uint256 tokenId, uint256 price) public payable {
         require(
@@ -162,7 +239,7 @@ contract GalacticCollectibles is ERC721URIStorage {
         for (uint i = 0; i < totalItemCount; i++) {
             if (idToMarketItem[i + 1].owner == msg.sender) {
                 itemCount += 1;
-            }
+            }   
         }
         // creating an empty array and providing the size of the array that is my item count as itemCount
         MarketItem[] memory items = new MarketItem[](itemCount);
