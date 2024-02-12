@@ -13,14 +13,14 @@ export default function Footer() {
                 className="inline-flex items-center text-black-800 text-xl md:text-2xl font-bold gap-2"
                 aria-label="logo"
               >
-                OceanNFT
+                GalactCollectiblesNFT
               </a>
             </div>
 
-            <p className="text--500 sm:pr-8 mb-6">
+            {/* <p className="text--500 sm:pr-8 mb-6">
               Filler text is dummy text which has no meaning however looks very
               similar to real text.
-            </p>
+            </p> */}
 
             <div className="flex gap-4">
               <a
@@ -271,7 +271,7 @@ export default function Footer() {
         </div>
 
         <div className="text--400 text-sm text-center border-t py-8">
-          © 2021 - Present Lorem ipsum. All rights reserved.
+          © 2024 - Present GalacticCollectibles. All rights reserved.
         </div>
       </footer>
     </div>

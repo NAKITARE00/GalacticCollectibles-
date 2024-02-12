@@ -4,7 +4,7 @@ export const NFTCard = () => {
     <>
       <div className="min-w-[350px] mx-4 relative">
         <img
-          src="Rectangle1.png"
+          src="planet1.jpg"
           alt="Rectangle1.png"
           className="rounded-t-xl"
         />
@@ -13,7 +13,7 @@ export const NFTCard = () => {
           <div className="gradient  grid grid-cols-2 backdrop-blur-xl  rounded-b-lg p-[10px]  min-h-[10rem] w-full border-1 border ">
             <div className="flex flex-col items-center justify-center h-full relative">
               <h1 className="font-rajdhani text-lg font-bold">
-                3D Abstract Hand
+                kepler 1 
               </h1>
               <div className="flex items-center py-2">
                 <img src="avatar.png" alt="avatar" />

@@ -132,11 +132,7 @@ export default function NavComponent() {
                 )}
               </>
             </div>
-            <Auth>
-                  <Table />
-
-                  <Modal />
-                </Auth>
+           
             <nav className="hidden sm:flex space-x-10 items-center">
               {navData.map((n) => {
                 return (
@@ -146,6 +142,11 @@ export default function NavComponent() {
                 );
               })}
             </nav>
+            <Auth>
+                  <Table />
+
+                  <Modal />
+                </Auth>
           </div>
         </div>
       </div>
