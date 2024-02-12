@@ -1,4 +1,4 @@
-This aims to revolutionize the way amateur astronomers engage with the cosmos by creating a dedicated NFT marketplace and community. This platform will empower enthusiasts to explore, share, and monetize their astronomical discoveries through non-fungible tokens (NFTs). By combining blockchain technology, community collaboration, and educational resources, the project seeks to foster a thriving ecosystem for amateur astronomers.
+This project aims to revolutionize the way amateur astronomers engage with the cosmos by creating a dedicated NFT marketplace and community. This platform will empower enthusiasts to explore, share, and monetize their astronomical discoveries through non-fungible tokens (NFTs). By combining blockchain technology, community collaboration, and educational resources, the project seeks to foster a thriving ecosystem for amateur astronomers.
 
 I. Introduction:
 A. Problem Statement:
